@@ -10,7 +10,7 @@
 	<packaging>pom</packaging>
 
 	<name>Ticket Mate</name>
-	<description>A simple q-ticket-management.</description>
+	<description>A simple q-ticket-management tool.</description>
 	<!-- FIXME change it to the project's website -->
 	<url>http://www.example.com</url>
 
