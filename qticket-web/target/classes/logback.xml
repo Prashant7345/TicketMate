@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration>
+	<property name="HOME_LOG" value="/app/qfc/logs/q-ticket" />
+	
+	<jmxConfigurator />
+	
+	<appender name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				<!-- %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): 
+					%msg%n%throwable -->
+				%d{HH:mm:ss.SSS} %-5level %logger{36}:%L - %msg%n
+			</Pattern>
+		</layout>
+	</appender>
+	
+	<!-- This appender to catch all except trace -->
+	<appender name="DEBUG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${HOME_LOG}/q_debug_p1.log</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${HOME_LOG}/q_debug_p1.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+			<maxFileSize>20MB</maxFileSize>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<encoder>
+<!-- 			<pattern>%d{ISO8601} %-5p [%c{3}] \(%t:%X{}\) %m%n</pattern> -->
+			<pattern>%d{HH:mm:ss.SSS} %-5level  %logger{36}:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- This appender to catch only errors -->
+	<appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${HOME_LOG}/q_error_p1.log</file>
+		<append>true</append>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<fileNamePattern>${HOME_LOG}/q_error_p1.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+			<maxFileSize>20MB</maxFileSize>
+		</rollingPolicy>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+		<encoder>
+<!-- 			<pattern>%d{ISO8601} %-5p [%c{3}] \(%t:%X{}\) %m%n</pattern> -->
+			<pattern>%d{HH:mm:ss.SSS} %-5level  %logger{36}:%L - %msg%n</pattern>
+		</encoder>
+	</appender>
+	
+	<appender name="DB_CONN" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<key>logFileName</key>
+			<defaultValue>db-conn</defaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${logFileName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>${HOME_LOG}/${logFileName}.log</file>
+				<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+					<Pattern>
+						%d{yyyy-MM-dd HH:mm:ss} %mdc [%thread] %level %logger{35} - %msg%n
+					</Pattern>
+				</encoder>
+				<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+					<FileNamePattern>${HOME_LOG}/${logFileName}.%i.log.zip
+					</FileNamePattern>
+					<MinIndex>1</MinIndex>
+					<MaxIndex>100</MaxIndex>
+				</rollingPolicy>
+				<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+					<MaxFileSize>10MB</MaxFileSize>
+				</triggeringPolicy>
+			</appender>
+		</sift>
+	</appender>
+	
+
+	
+	<root>
+		<level value="${logger.root.level}" />
+		<appender-ref ref="DEBUG_FILE" />
+		<appender-ref ref="ERROR_FILE" />
+		<appender-ref ref="CONSOLE"/>
+	</root>
+	
+	
+<!-- Third Parties Logs -->
+	<logger name="com.mchange" level="WARN" additivity="false">
+		<appender-ref ref="DB_CONN" />
+	</logger>
+	<logger name="org.springframework"> 
+		<level value="DEBUG" />
+	</logger>
+	<logger name="org.hibernate">
+		<level value="WARN" />
+	</logger>
+	<logger name="org">
+		<level value="WARN" />
+	</logger>
+	<logger name="com.mchange">
+		<level value="WARN" />
+	</logger>
+	<!-- org.dozer -->
+	<logger name="org.dozer">
+		<level value="WARN" />
+	</logger>
+	<logger name="com.qt">
+		<level value="DEBUG" />
+	</logger>
+</configuration>
+
+
